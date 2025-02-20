@@ -22,3 +22,9 @@ This repository contains Python scripts for performing curve fitting on experime
 ## Usage
 
 (Coming soon)
+
+## To do
+
+1. Modularize scripts
+2. Add file structure
+3. Write setup.py / pyproject.toml
