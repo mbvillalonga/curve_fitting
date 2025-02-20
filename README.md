@@ -44,5 +44,8 @@ curve_fitting/
 
 ## To do
 
-1. Modularize scripts
-2. Write setup.py / pyproject.toml
+1. Modularize scripts according to directory structure
+2. statistical_tests.py: modify to take as input a list of curve functions
+3. Update individual script annotation
+4. Write setup.py / pyproject.toml
+5. Update README with final summary
