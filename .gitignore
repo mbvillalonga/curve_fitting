@@ -1,2 +1,3 @@
 # Does not track original input data files
 *.xls
+*.csv

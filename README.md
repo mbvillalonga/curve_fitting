@@ -19,9 +19,9 @@ curve_fitting/
 |-- README.md
 |-- requirements.txt
 |-- data/
-|   |-- cleaned/                # Store copy of cleaned data files for each subject; input for data_processing.py
+|   |-- processed/          # Store copy of processed data files for each subject; input for data_processing.py
 |   |-- for_analysis/           # Store reduced and combined data; output from data_processing.py
-|-- src/                # Python modules
+|-- src/                        # Python modules
 |   |-- data_processing.py      # Prepare data for analysis
 |   |-- descriptives.py         # Generate descriptive stats and visualizations for different dependent variables
 |   |-- curve_fitting.py        # Fit curves to subject-level data and export model results
@@ -45,5 +45,4 @@ curve_fitting/
 ## To do
 
 1. Modularize scripts
-2. Add file structure
-3. Write setup.py / pyproject.toml
+2. Write setup.py / pyproject.toml
