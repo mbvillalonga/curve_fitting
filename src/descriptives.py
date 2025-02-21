@@ -19,10 +19,21 @@ def compute_descriptive_stats(data_path, variables, group_vars, output_dir):
     """
 
     # Load relevant CSV files
+    df = pd.read_csv(data_path)
 
-    # Compute per-subject and grand mean statistics
+    missing_vars = [var for var in variables + group_vars + ["subj_idx"] if var not in df.columns]
+    if missing_vars:
+        raise ValueError(f"Missing columns in {data_path}: {missing_vars}")
+    
+    # Compute per-subject stats
+    subj_stats = df.groupby(group_vars + ["subj_idx"])[variables].agg(['count','mean','std']).reset_index()
+
+    # Compute grand mean across subjects
+    subj_means = df.groupby(group_vars + ["subj_idx"])[variables].mean().reset_index()
+    grand_mean = subj_stats.groupby(group_vars)[variables].agg['mean','std'].reset_index()
 
     # Output summary tables
+    return subj_stats, grand_mean
 
 def plot_subject_data(df, indep_vars, dep_vars, group_vars, output_dir):
     """
@@ -37,5 +48,5 @@ def plot_subject_data(df, indep_vars, dep_vars, group_vars, output_dir):
     """
 
     # Load relevant CSV files 
-    
+
     # Output summary plots

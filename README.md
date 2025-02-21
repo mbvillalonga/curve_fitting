@@ -1,17 +1,12 @@
 # curve_fitting
 
-_This README is a work in progress and is updated in an ongoing fashion._
+_This README is a work in progress and will be updated in an ongoing fashion._
 
-This repository contains Python scripts for performing curve fitting on experimental data. These scripts facilitate data analysis by fitting mathematical models to observed data points, estimating parameters, and visualizing fitted curves.
+## About
 
-## Features
+This repository contains Python scripts for cleaning and analyzing experimental data collected by the Ashton Graybiel Spatial Orientation Laboratory at Brandeis University. These scripts were developed to facilitate data analysis by fitting mathematical models to observed data points, estimating parameters, and visualizing fitted curves.
 
-- **Flexible model fitting**: Supports linear, polynomial, and nonlinear curve fitting.
-- **Customizable models**: Define custom mathematical functions to fit a variety of experimental data.
-- **Goodness-of-fit metrics**: Includes R<sup>2</sup>, RMSE, and residual analysis to evaluate model performance.
-- **Visualization tools**: Plots raw data alongside fitted curves for easy interpretations.
-
-## Project Directory
+## Directory Structure
 
 ```
 curve_fitting/
@@ -30,6 +25,13 @@ curve_fitting/
 |   |-- main.py                 # 
 ```
 
+## Features
+
+- **Flexible model fitting**: Supports linear, polynomial, and nonlinear curve fitting.
+- **Customizable models**: Define custom mathematical functions to fit a variety of experimental data.
+- **Goodness-of-fit metrics**: Includes R<sup>2</sup>, RMSE, and residual analysis to evaluate model performance.
+- **Visualization tools**: Plots raw data alongside fitted curves for easy interpretations.
+
 ## Dependencies
 
 - Python 3.x
@@ -42,7 +44,7 @@ curve_fitting/
 
 (Coming soon)
 
-## To do
+## To-Do
 
 1. Modularize scripts according to directory structure:
 
@@ -50,7 +52,7 @@ curve_fitting/
     - descriptives.py :yellow_circle: (Have outline)
     - curve_fitting.py :x:
     - statistical_tests.py :x:
-    - visualization.py :x:
+    - model_visualization.py :x:
     - main.py :x:
 
 2. statistical_tests.py: modify to take as input a list of curve functions
