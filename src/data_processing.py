@@ -1,52 +1,51 @@
 import pandas as pd
-import os
+from pathlib import Path
 
 # For each trial group (contained in a subdirectory of /data/processed)
 # combine files from all subjects into one data frame
 
-# Define paths
-script_dir = os.path.dirname(os.path.abspath(__file__)) # dir with current file
-data_base_dir = os.path.normpath(os.path.join(script_dir, "..", "data")) # dir with data files
-paths_list = [ # data subdirs 
-    os.path.join(data_base_dir, "processed", "flight_xls_midline"), # for DVs related to subjective vertical/rear
-    os.path.join(data_base_dir, "processed", "flight_xls_pointback") # for DVs related to displacement and midline
+# %%
+# Define directory paths using pathlib
+script_dir = Path(__file__).resolve().parent # dir with data_processing.py (this file)
+project_dir = script_dir.parent # main project directory
+data_base_dir = project_dir / "data" # dir with all data
+paths_list = [ # data subdirs with input for cleaning
+    data_base_dir / "processed" / "flight_xls_midline", # acceptable trials for DVs related to SUBJECTIVE VERTICAL/REAR
+    data_base_dir / "processed" / "flight_xls_pointback" # accepable trials for DVs related to DISPLACEMENT and MIDLINE
 ]
 
-# Output directory
-data_out_dir = os.path.join(data_base_dir, "for_analysis") 
-os.makedirs(data_out_dir, exist_ok=True)
+data_out_dir = data_base_dir / "for_analysis" # output directory for cleaned data
+data_out_dir.mkdir(parents=True, exist_ok=True)  # creates directory if missing
+
+
+#%%
+
+combined_data = {} # initialize dict that will store processed data from all subjects, all acceptable trials
 
 # Iterate over each subdir of processed data (each subdir contains a different subset of trials)
 for paths in paths_list:
-    df_list = [] # Initialize empty list to store combined data for this trial group
-    folder_name = os.path.basename(paths) # store trial group for metadata
-    if folder_name == "flight_xls_pointback":
-        trial_group = "d_ml_trials" # renames file correctly for DVs related to displacement and midline
+    df_list = [] # initialize empty list to store combined data for this trial group
+    folder_name = paths.name 
+    if folder_name == "flight_xls_pointback": # store trial group for metadata
+        trial_group = "d_ml_trials" # renames file correctly for DVs related to DISPLACEMENT (d) and MIDLINE (ml)
     else:
-        trial_group = "v_r_trials" # renames file correctly for DVs related to subjective vertical/rear
+        trial_group = "v_r_trials" # renames file correctly for DVs related to SUBJECTIVE VERTICAL (v)/REAR (r)
 
     print(f"Processing directory: {paths}")
 
-    if not os.path.exists(paths):
+    if not paths.exists():
         print(f"Warning: Path {paths} does not exist. Skipping...")
         continue # skip if folder doesn't exist
 
-    flight_dirs = os.listdir(paths) # list all flight subdirs
-
-    for flight in flight_dirs:
-        flight_path = os.path.join(paths, flight)
-
-        if os.path.isdir(flight_path): # ensure it's a directory and not a file
-            files = os.listdir(flight_path)
-
-            for file in files:
-                if not file.startswith('.'): # ignore hidden files
-                    file_path = os.path.join(flight_path, file)
-
+    for flight_path in paths.iterdir():
+        if flight_path.is_dir(): # ensure it's a directory and not a file
+            for file_path in flight_path.glob("*"):
+                if not file_path.name.startswith('.'): # ignore hidden files
                     try:
                         df_temp = pd.read_excel(file_path)
-                        df_temp["source_folder"] = folder_name # add trial group metadata
-                        df_temp["flight"] = flight # add flight metadata
+                        df_temp["source_folder"] = folder_name # add metadata listing the input folder (HP data)
+                        df_temp["flight"] = flight_path.name # add flight metadata 
+                        df_temp["use_for_2025"] = trial_group # this indicates whether rows should be used for d_ml or v_r analyses
                         df_list.append(df_temp) # add current file's data to data_list
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
@@ -54,8 +53,65 @@ for paths in paths_list:
     # Concatenate all data into a single dataframe for this trial group
     if df_list:
         df_combined = pd.concat(df_list, ignore_index=True)
-        out_file = os.path.join(data_out_dir, f"{trial_group}_combined.csv")
-        df_combined.to_csv(out_file, index=False)
-        print(f"Saved combined dataset to: {out_file}")
+        combined_data[trial_group] = df_combined # store in dict for subsequent data reduction
+        #out_file = os.path.join(data_out_dir, f"{trial_group}_combined.csv")
+        #df_combined.to_csv(out_file, index=False)
+        print(f"Stored DataFrame for {trial_group} (Rows: {df_combined.shape[0]})")
     else:
-        print(f"No valid files found in {folder_name}. Skipping CSV creation.")
+        print(f"No valid files found in {folder_name}. Skipping DataFrame creation.")
+
+# %%
+# Create new variables to use in analyses
+
+for name, df in combined_data.items():
+    print(f"\nProcessing dataset: {name}")
+
+    # if statements make sure the required columns exist before creating new variables
+    if "csv_file" in df.columns:
+        df['subj_idx'] = df['csvfile'].str.rsplit('/').str[-1].str.split('_').str[0] # subject ID
+        df['bed_chair'] = df['csvfile'].str.rsplit('_').str[-2].str.split('-').str[-1] # posture condition: v=bed, r=chair
+    
+    if "turn_displacement" in df.columns:
+        df['abs_turn_displacement'] = abs(df['turn_displacement']) # absolute value of intended turn amplitude
+    
+    if "intended_abs_peak_velocity" in df.columns:
+        df['intended_abs_peak_velocity_cat'] = round(df['intended_abs_peak_velocity'].astype('int64')) # categorical version of variable
+    
+    
+
+# %%
+# Import list of variables to keep
+try:
+    vars_to_keep_path = project_dir / "vars_to_keep.csv"
+    vars_to_keep = pd.read_csv(vars_to_keep_path, header=None).squeeze("columns").dropna().tolist()
+    print(f"Successfully loaded {len(vars_to_keep)} variables from vars_to_keep.csv")
+except FileNotFoundError:
+    print(f"Error: File not found - {vars_to_keep_path}")
+    vars_to_keep = []
+except pd.errors.EmptyDataError:
+    print("Error: vars_to_keep.csv is empty.")
+    vars_to_keep = []
+except Exception as e:
+    print(f"Error loading vars_to_keep.csv: {e}")
+    vars_to_keep = []
+
+# %%
+# Data reduction: remove variables that will not be used for analysis
+for key, df in combined_data.items():
+    # select columns that actually exist in the data
+    cols_to_keep = [col for col in vars_to_keep if col in df.columns]
+
+    if not cols_to_keep:
+        print(f"Warning: No valid columns found for {key}. Skipping export.")
+        continue
+
+    # keep only selected columns in a temporary dataframe
+    df_reduced = df[cols_to_keep]
+    
+    # export reduced dataframe as csv
+    out_file = data_out_dir / f"{key}_cleaned_allsubj.csv"
+    try:
+        df_reduced.to_csv(out_file, index=False)
+        print(f"Exported {key} file to:\n{data_out_dir}")
+    except Exception as e:
+        print(f"Error saving output file: {e}")
