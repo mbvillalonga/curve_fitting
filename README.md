@@ -44,7 +44,15 @@ curve_fitting/
 
 ## To do
 
-1. Modularize scripts according to directory structure
+1. Modularize scripts according to directory structure:
+
+    - data_processing.py :yellow_circle: (Need to formalize as method)
+    - descriptives.py :yellow_circle: (Have outline)
+    - curve_fitting.py :x:
+    - statistical_tests.py :x:
+    - visualization.py :x:
+    - main.py :x:
+
 2. statistical_tests.py: modify to take as input a list of curve functions
 3. Update individual script annotation
 4. Write setup.py / pyproject.toml
