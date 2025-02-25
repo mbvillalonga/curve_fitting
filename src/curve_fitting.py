@@ -3,14 +3,14 @@ from scipy.optimize import curve_fit
 from pathlib import Path
 from curve_functions import MODEL_FUNCTIONS # Import all polynomial functions
 
-def fit_curve(data_path, x_col, y_col, model_name, func):
+def fit_curve(data, x_col, y_col, model_name, func):
     """
     Fits the specified function to the data.
 
     Parameters:
-    - data_path (Path or str or pd.DataFrame): Path to the CSV file (or DataFrame) with x and y values
-    - x_col (str): Column name for x values
-    - y_col (str): Column name for y values
+    - data (Path, str, or pd.DataFrame): Path to the CSV file with x and y values, or the DataFrame itself
+    - x_col (str): Column name for x values (independent variable)
+    - y_col (str): Column name for y values (dependent variable)
     - model_name (str): Name of the model (function) to fit
     - func (callable): The formula of the function 
 
@@ -20,12 +20,12 @@ def fit_curve(data_path, x_col, y_col, model_name, func):
     fitted_params = []
 
     # Load relevant pd.DataFrame or CSV file
-    if isinstance(data_path, pd.DataFrame):
-        df = data_path.copy()
-    elif isinstance(data_path, (str, Path)):
-        df = pd.read_csv(data_path)
+    if isinstance(data, pd.DataFrame):
+        df = data.copy()
+    elif isinstance(data, (str, Path)):
+        df = pd.read_csv(data)
     else:
-        raise ValueError(f"Invalid data input type: {type(data_path)}. Expected a DataFrame or file path.")
+        raise ValueError(f"Invalid data input type: {type(data)}. Expected a DataFrame or file path.")
 
     # Group by subject, posture condition, and g-level
     for (subj, g_level, posture), group in df.groupby(["subj_idx", "g_level_corrected", "bed_chair"]):
