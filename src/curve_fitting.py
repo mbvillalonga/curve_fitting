@@ -1,9 +1,9 @@
 import pandas as pd
 from scipy.optimize import curve_fit
 from pathlib import Path
-from curve_functions import linear, quadratic, cubic, quartic  # Import polynomial functions
+from curve_functions import MODEL_FUNCTIONS # Import all polynomial functions
 
-def fit_curve(data_path, x_col, y_col, func):
+def fit_curve(data_path, x_col, y_col, model_name, func):
     """
     Fits the specified function to the data.
 
@@ -11,7 +11,8 @@ def fit_curve(data_path, x_col, y_col, func):
     - data_path (Path or str or pd.DataFrame): Path to the CSV file (or DataFrame) with x and y values
     - x_col (str): Column name for x values
     - y_col (str): Column name for y values
-    - func (callable): The function to fit
+    - model_name (str): Name of the model (function) to fit
+    - func (callable): The formula of the function 
 
     Returns:
     - pd.DataFrame: Dataframe with fitted parameters.
@@ -33,12 +34,12 @@ def fit_curve(data_path, x_col, y_col, func):
 
         try:
             params, _ = curve_fit(func, x_data, y_data)
-            fitted_params.append([subj, g_level, posture] + list(params)) # add column with function name, and make sure GOF stats are here
+            fitted_params.append([subj, g_level, posture, model_name] + list(params)) # add column with function name, and make sure GOF stats are here
         except RuntimeError:
             print(f"Curve fitting failed for subject {subj}, g-level {g_level}, posture condition {posture}")
     
     # Convert to DataFrame
-    param_columns = ["subj_idx", "g_level_corrected", "bed_chair"] + [f"param_{i}" for i in range(len(params))]
+    param_columns = ["subj_idx", "g_level_corrected", "bed_chair", "model"] + [f"param_{i}" for i in range(len(params))]
     return pd.DataFrame(fitted_params, columns=param_columns)
 
 if __name__ == "__main__":
@@ -46,12 +47,24 @@ if __name__ == "__main__":
     output_dir = Path(__file__).resolve().parent.parent / "data" / "curve_fitting_output"
     output_dir.mkdir(exist_ok=True)
 
-    func_to_fit = "linear"
+    ## IF FITTING ALL FUNCTIONS IN CURVE_FUNCTIONS.PY:
+    all_fitted_params = []
 
-    # Fit curves (change arguments as needed, depending on your IV, DV, and function)
-    # Make sure your function is defined in curve_functions.py
-    fitted_params_df = fit_curve(data_path, "turn_displacement", "indicated_displacement", linear)
+    for model_name, func in MODEL_FUNCTIONS.items():
+        print(f"Fitting {model_name} model...")
+        fitted_params_df = fit_curve(data_path, "turn_displacement", "indicated_displacement", model_name, func)
+        all_fitted_params.append(fitted_params_df)
 
-    # Save fitted parameters
-    fitted_params_df.to_csv(output_dir / f"fitted_parameters_{func_to_fit}.csv", index=False)
-    print("Fitted parameters saved to:", output_dir / "fitted_parameters.csv")
+    # Concatenate all fitted parameters and save
+    all_fitted_params_df = pd.concat(all_fitted_params, ignore_index=True)
+    all_fitted_params_df.to_csv(output_dir / "fitted_parameters_all_models.csv", index=False)
+    print("All fitted parameters saved to: ", output_dir / "fitted_parameters_all_models.csv")
+
+    ### IF FITTING A SINGLE FUNCTION:
+    ## Fit curves (change arguments as needed, depending on your IV, DV, and function)
+    ## Make sure your function is defined in curve_functions.py
+    #fitted_params_df = fit_curve(data_path, "turn_displacement", "indicated_displacement", linear)
+
+    ## Save fitted parameters
+    #fitted_params_df.to_csv(output_dir / f"fitted_parameters_{func_to_fit}.csv", index=False)
+    #print("Fitted parameters saved to:", output_dir / "fitted_parameters.csv")

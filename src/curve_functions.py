@@ -1,5 +1,3 @@
-import numpy as np
-
 # Define list of curve functions
 
 # Linear:
