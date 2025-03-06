@@ -26,7 +26,7 @@ v_r_file = data_dir_cleaned / "v_r_trials_cleaned_allsubj.csv"
 
 # %%
 # Validate above directories and files
-print("TESTING: Validating directories and files...") # for testing
+# print("TESTING: Validating directories and files...") # for testing
 if not data_dir_cleaned.exists():
     sys.exit(f"***ERROR*** Data directory not found: {data_dir_cleaned}")
 
@@ -62,7 +62,7 @@ print(f"  - Results Directory: {results_dir}")
 # Run data processing only if enabled
 if run_data_processing:
     print("\n- Running data processing step...")
-#REMOVE AFTER DEBUG    os.system("python src/data_processing.py") # runs src/data_processing.py as subprocess
+    os.system("python src/data_processing.py") # runs src/data_processing.py as subprocess
     print("Data processing complete.")
 
 # Define which dataset each dependent variable (DV) belongs to
@@ -96,15 +96,15 @@ for dep_var in dep_vars:
     dep_var_res_dir.mkdir(parents=True, exist_ok=True)
 
     # Load dataset
-    print(f"TESTING: Loading data set: {dataset_file}") # for testing
+    # print(f"TESTING: Loading data set: {dataset_file}") # for testing
     df = pd.read_csv(dataset_file)
-    print(f"TESTING: Successfully loaded {df.shape[0]} rows and {df.shape[1]} columns.") # for testing
+    # print(f"TESTING: Successfully loaded {df.shape[0]} rows and {df.shape[1]} columns.") # for testing
 
     # Compute descriptive statistics (src/descriptives.py)
     print(f"- Computing descriptive statistics for {dep_var}...")
-#REMOVE AFTER DEBUG    subj_stats, grand_mean = compute_descriptive_stats(df, [dep_var], group_vars, dep_var_res_dir)
-#REMOVE AFTER DEBUG    subj_stats.to_csv(dep_var_res_dir / f"subj_stats_{dep_var}.csv", index=False)
-#REMOVE AFTER DEBUG    grand_mean.to_csv(dep_var_res_dir / f"grand_means_{dep_var}.csv", index=False)
+    subj_stats, grand_mean = compute_descriptive_stats(df, [dep_var], group_vars, dep_var_res_dir)
+    subj_stats.to_csv(dep_var_res_dir / f"subj_stats_{dep_var}.csv", index=False)
+    grand_mean.to_csv(dep_var_res_dir / f"grand_means_{dep_var}.csv", index=False)
     # TO DO: check descriptives module for success message
 
     # Perform curve fitting (src/curve_fitting.py)
@@ -112,37 +112,37 @@ for dep_var in dep_vars:
     fitted_params_list = []
     for model_name in curve_functions:
         if model_name in MODEL_FUNCTIONS:
-            print(MODEL_FUNCTIONS[model_name]) # for testing
-#REMOVE AFTER DEBUG            fitted_params_df = fit_curve(df, x_var, dep_var, model_name, MODEL_FUNCTIONS[model_name])
-#REMOVE AFTER DEBUG            fitted_params_list.append(fitted_params_df)
+            #print(MODEL_FUNCTIONS[model_name]) # for testing
+            fitted_params_df = fit_curve(df, x_var, dep_var, model_name, MODEL_FUNCTIONS[model_name])
+            fitted_params_list.append(fitted_params_df)
         else:
             print(f"***WARNING*** {model_name} not found in src/curve_functions.py. Skipping.")
     # TO DO: check curve fitting module for success message
 
     # Save curve fitting results
-#REMOVE AFTER DEBUG    all_fitted_params = pd.concat(fitted_params_list, ignore_index=True)
-#REMOVE AFTER DEBUG    all_fitted_params.to_csv(dep_var_res_dir / f"fitted_parameters_{dep_var}.csv", index=False)
+    all_fitted_params = pd.concat(fitted_params_list, ignore_index=True)
+    all_fitted_params.to_csv(dep_var_res_dir / f"fitted_parameters_{dep_var}.csv", index=False)
     # TO DO: check curve fitting module for success message
 
     # Compute goodness-of-fit and generate figures
     print(f"- Computing goodness-of-fit for {dep_var}...")
     gof_res = []
-#REMOVE AFTER DEBUG    for model_name in curve_functions:
-#REMOVE AFTER DEBUG        gof_df = compute_gof(df, x_var, dep_var, model_name, curve_functions[model_name], all_fitted_params)
-#REMOVE AFTER DEBUG        gof_res.append(gof_df)
+    for model_name in curve_functions:
+        gof_df = compute_gof(df, x_var, dep_var, model_name, curve_functions[model_name], all_fitted_params)
+        gof_res.append(gof_df)
     
-#REMOVE AFTER DEBUG    all_gof = pd.concat(gof_res, ignore_index=True)
-#REMOVE AFTER DEBUG    all_gof.to_csv(dep_var_res_dir / f"goodness_of_fit_{dep_var}.csv", index=False)
-#REMOVE AFTER DEBUG    plot_goodness_of_fit(all_gof, dep_var, results_dir)
+    all_gof = pd.concat(gof_res, ignore_index=True)
+    all_gof.to_csv(dep_var_res_dir / f"goodness_of_fit_{dep_var}.csv", index=False)
+    plot_goodness_of_fit(all_gof, dep_var, results_dir)
     # TO DO: check gof module for success message
 
     # Perform ANOVAs and generate figures showing group mean of each model parameter by condition, 
     # corresponding to ANOVA results
     print(f"- Running ANOVAs and generating figures for each model's parameters, {dep_var}...")
-#REMOVE AFTER DEBUG    for model in curve_functions:
-#REMOVE AFTER DEBUG        anova_res = run_anova(all_fitted_params, model)
-#REMOVE AFTER DEBUG        anova_res.to_csv(dep_var_res_dir / f"anova_results_{dep_var}_{model}.csv")
-#REMOVE AFTER DEBUG        plot_anova_results(df, model, anova_res, dep_var_res_dir)
+    for model in curve_functions:
+        anova_res = run_anova(all_fitted_params, model)
+        anova_res.to_csv(dep_var_res_dir / f"anova_results_{dep_var}_{model}.csv")
+        plot_anova_results(df, model, anova_res, dep_var_res_dir)
     # TO DO: check anova module for success message
 
 print("\nAnalysis complete. Results saved in: ", results_dir)
