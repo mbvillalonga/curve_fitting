@@ -29,9 +29,11 @@ def quartic(x, a, b, c, d, e):
 #    return formula # Example: a**x
 
 # Dictionary to store functions
+# UNCOMMENT LAST LINE IF USING CUSTOM FUNCTION
 MODEL_FUNCTIONS = {
     "linear": linear,
     "quadratic": quadratic,
     "cubic": cubic,
-    "quartic": quartic
+    "quartic": quartic,
+    #"custom": custom_fxn,
 }

@@ -142,7 +142,7 @@ def plot_anova_results(df, model_name, anova_results, output_dir):
                             bbox=dict(facecolor="white", edgecolor="red", boxstyle="round,pad=0.3"))
 
         # Save plot
-        plot_path = output_dir / f"{model_name}_{param}_anova_plot.png"
+        plot_path = output_dir / f"{model_name}_model" / f"{model_name}_{param}_anova_plot.png"
         plt.savefig(plot_path)
         plt.close()
 

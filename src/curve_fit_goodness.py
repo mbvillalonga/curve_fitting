@@ -46,12 +46,13 @@ def compute_gof(data, x_col, y_col, model_name, func, fitted_params):
 
     return pd.DataFrame(results, columns=["subj_idx", "g_level_corrected", "bed_chair", "model", "R_squared", "RMSE"])
 
-def plot_goodness_of_fit(df, output_dir):
+def plot_goodness_of_fit(df, dep_var, output_dir):
     """
     Generates comparison plots for goodness-of-fit statistics, considering different conditions.
 
     Parameters:
     - df (pd.DataFrame): Data containing R^2 and RMSE values for all models.
+    - dep_var (str): Name of dependent variable
     - output_dir (Path): Directory to save plots.
     """
 
@@ -82,7 +83,7 @@ def plot_goodness_of_fit(df, output_dir):
     plt.suptitle("Comparison of RMSE Across Models, Grouped by Condition")
     plt.xticks(rotation=45)
     plt.tight_layout()
-    plt.savefig(output_dir / "rmse_comparison_by_condition.png")
+    plt.savefig(output_dir / f"rmse_comparison_by_condition_{dep_var}.png")
     plt.close()
 
     print("Model comparison plots saved to:", {output_dir})
