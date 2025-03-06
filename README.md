@@ -10,19 +10,27 @@ This repository contains Python scripts for cleaning and analyzing experimental 
 
 ```
 curve_fitting/
-|-- .gitignore
-|-- README.md
-|-- requirements.txt
-|-- data/
-|   |-- processed/          # Store copy of processed data files for each subject; input for data_processing.py
-|   |-- for_analysis/           # Store reduced and combined data; output from data_processing.py
-|-- src/                        # Python modules
+|-- README.md               # Instructions for lab members - START HERE!
+|
+|-- src/                    # All Python scripts and modules
 |   |-- data_processing.py      # Prepare data for analysis
-|   |-- descriptives.py         # Generate descriptive stats and visualizations for different dependent variables
+|   |-- descriptives.py         # Generate descriptive stats for different dependent variables
+|   |-- curve_functions.py      # Define polynomial and custom functions for curve fitting
 |   |-- curve_fitting.py        # Fit curves to subject-level data and export model results
-|   |-- statistical_tests.py    # Run ANOVAs on estimated model parameters
+|   |-- curve_fit_goodness.py   # Generate goodness of fit statistics for each model
+|   |-- anova_fitted_params.py # Run ANOVAs on estimated model parameters
 |   |-- visualization.py        # Visualize model fits
-|   |-- main.py                 # 
+|
+|-- data/                   # Data files
+|   |-- processed/              # HP's processed data from 2012
+|   |-- for_analysis/           # Combined data from all Ss
+|   |-- curve_fitting_output/   # Output folder with model fit and ANOVA results 
+|
+|-- analysis_config.env     # Configuration file (TO BE EDITED FOR CUSTOM ANALYSES)
+|-- run_analysis.py         # Main script that runs everything
+|-- requirements.txt        # Dependencies for the project
+
+
 ```
 
 ## Features
