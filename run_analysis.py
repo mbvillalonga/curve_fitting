@@ -1,6 +1,10 @@
+# %%
 import os
 import sys
 from pathlib import Path
+# Add src/ to Python's module search path
+sys.path.append(str(Path(__file__).resolve().parent / "src"))
+
 import pandas as pd
 from dotenv import load_dotenv
 from src.descriptives import compute_descriptive_stats
@@ -9,14 +13,18 @@ from src.curve_fitting import fit_curve
 from src.curve_fit_goodness import compute_gof, plot_goodness_of_fit
 from src.anova_fitted_params import run_anova, plot_anova_results
 
+
+# %%
 # Load .env 
 load_dotenv("analysis_config.env")
 
+# %%
 # Fixed cleaned data directory and files (users should not change these)
 data_dir_cleaned = Path(os.getenv("DATA_DIR_CLEANED")).resolve()
 d_ml_file = data_dir_cleaned / "d_ml_trials_cleaned_allsubj.csv"
 v_r_file = data_dir_cleaned / "v_r_trials_cleaned_allsubj.csv"
 
+# %%
 # Validate above directories and files
 print("TESTING: Validating directories and files...") # for testing
 if not data_dir_cleaned.exists():
@@ -28,10 +36,12 @@ if not d_ml_file.exists():
 if not v_r_file.exists():
     sys.exit(f"***ERROR*** Missing dataset: {v_r_file}")
 
+# %%
 # Results directory (see analysis_config.env to modify)
 results_dir = Path(os.getenv("RESULTS_DIR")).resolve()
 results_dir.mkdir(parents=True, exist_ok=True)
 
+# %%
 # Load other settings from .env
 run_data_processing = os.getenv("RUN_DATA_PROCESSING", "False").lower() == "true"
 x_var = os.getenv("X_VAR").strip()
@@ -39,6 +49,7 @@ group_vars = [var.strip() for var in os.getenv("GROUP_VARS").split(",")]
 dep_vars = [var.strip() for var in os.getenv("DEP_VARS").split(",")]
 curve_functions = [var.strip() for var in os.getenv("CURVE_FUNCTIONS").split(",")]
 
+# %%
 # Debugging: Print loaded settings
 print(f"\nTESTING: Settings Loaded from .env:")
 print(f"  - X Variable: {x_var}")
@@ -47,6 +58,7 @@ print(f"  - Dependent Variables: {dep_vars}")
 print(f"  - Curve Functions: {curve_functions}")
 print(f"  - Results Directory: {results_dir}")
 
+# %%
 # Run data processing only if enabled
 if run_data_processing:
     print("\n- Running data processing step...")
@@ -60,6 +72,7 @@ d_ml_vars = {
     "turn_end_joystick_position", "midline_indicated_angle", "turn_rms_track_error"
 }
 
+# %%
 # Run analysis for each DV
 for dep_var in dep_vars:
     print(f"\n- Processing dependent variable: {dep_var}")
