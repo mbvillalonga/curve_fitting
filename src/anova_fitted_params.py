@@ -1,6 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-#import seaborn as sns
 from statsmodels.stats.anova import AnovaRM
 from pathlib import Path
 
@@ -58,14 +56,17 @@ def plot_anova_results(df, model_name, anova_results, output_dir):
     - anova_results (dict): Dictionary containing ANOVA results and p-values
     - output_dir (Path): Directory where plots will be saved
     """
+    import matplotlib.pyplot as plt
 
+    plt.rcParams.update(plt.rcParamsDefault)  # ✅ Resets all settings
+    plt.style.use("default")  # ✅ Ensures consistent style
     output_dir.mkdir(exist_ok=True) # Ensure output directory exists
 
     # Filter dataset for the selected model
     df_model = df[df["model"] == model_name]
 
     # Get all parameter columns
-    param_cols = [col for col in df.columns if col.startswith("param_")]
+    param_cols = [col for col in df_model.columns if col.startswith("param_")]
 
     # Capitalize model name for title
     model_name_cap = model_name.capitalize()
@@ -113,17 +114,6 @@ def plot_anova_results(df, model_name, anova_results, output_dir):
                 color="black", capsize=5, elinewidth=1
             )
 
-        # Set x-axis labels
-        plt.xticks(ticks=range(len(category_order)), labels=category_order)
-
-        # Set labels and title
-        plt.xlabel("G-level")
-        plt.ylabel(f"Group mean {param} +/- 1SD")
-        plt.title(f"{model_name_cap} - {param} by Condition")
-
-        # Add cleaned legend
-        plt.legend(handles=legend_handles, title="Posture", loc="upper right")
-
         # Add annotation if there is a significant effect
         if param in anova_results:
             p_values = anova_results[param]["Pr > F"]
@@ -140,13 +130,28 @@ def plot_anova_results(df, model_name, anova_results, output_dir):
                 sig_text = "Significant: " + ", ".join(significant_effects)
                 plt.annotate(sig_text, xy=(0.05, 0.95), xycoords="axes fraction", fontsize=10, color="red",
                             bbox=dict(facecolor="white", edgecolor="red", boxstyle="round,pad=0.3"))
+                
+        # Set x-axis labels
+        plt.xticks(ticks=range(len(category_order)), labels=category_order)
 
-        # Save plot
-        plot_path = output_dir / f"{model_name}_model" / f"{model_name}_{param}_anova_plot.png"
-        plt.savefig(plot_path)
+        # Set labels and title
+        plt.xlabel("G-level")
+        plt.ylabel(f"Group mean {param} +/- 1SD")
+        plt.title(f"{model_name_cap} - {param} by Condition")
+
+        # Add cleaned legend
+        plt.legend(handles=legend_handles, title="Posture", loc="upper right")
+
+        # Ensure the output directory for this model exists
+        plot_dir = output_dir / f"anova_plots_{model_name}_model"
+        plot_dir.mkdir(parents=True, exist_ok=True)
+        # Construct the full file path for the plot
+        plot_name = plot_dir / f"{model_name}_{param}_anova_plot.pdf"
+        # Save the plot
+        plt.savefig(str(plot_name), format="pdf", bbox_inches="tight")  # Ensure this is a string path
         plt.close()
 
-        print(f"Saved ANOVA plot for {param}: {plot_path}")
+        print(f"Saved ANOVA plot for {param}: {plot_name}")
 
 if __name__ == "__main__":
     # Define paths

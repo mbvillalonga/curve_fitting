@@ -24,7 +24,7 @@ curve_fitting/
 |-- data/                   # Data files
 |   |-- processed/              # HP's processed data from 2012
 |   |-- for_analysis/           # Combined data from all Ss
-|   |-- curve_fitting_output/   # Output folder with model fit and ANOVA results 
+|   |-- analysis_output/        # Output folder with summary stats, model fits, and ANOVA results 
 |
 |-- analysis_config.env     # Configuration file (TO BE EDITED FOR CUSTOM ANALYSES)
 |-- run_analysis.py         # Main script that runs everything

@@ -2,4 +2,6 @@
 *.xls
 *.csv
 __pycache__/
+data/testing/
 .DS_Store
+subj_to_keep.env

@@ -27,9 +27,9 @@ def compute_gof(data, x_col, y_col, model_name, func, fitted_params):
         params = row.iloc[4:].values # Extract model parameters; make this adaptive in case of custom functions
 
         # Get subject-specific  data
-        subj_df = df[(df["subj_idx"] == subj) & 
-                    (df["g_level_corrected"] == g_level) & 
-                    (df["bed_chair"] == posture)]
+        subj_df = data[(data["subj_idx"] == subj) & 
+                    (data["g_level_corrected"] == g_level) & 
+                    (data["bed_chair"] == posture)]
         x_data = subj_df[x_col].values
         y_true = subj_df[y_col].values
         y_pred = func(x_data, *params[:func.__code__.co_argcount - 1])

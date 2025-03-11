@@ -6,7 +6,7 @@ from pathlib import Path
 
 # %%
 # Define directory paths using pathlib
-script_dir = Path(__file__).resolve().parent # dir with data_processing.py (this file)
+script_dir = Path(__file__).resolve().parent # dir with data_cleaning.py (this file)
 project_dir = script_dir.parent # main project directory
 data_base_dir = project_dir / "data" # dir with all data
 paths_list = [ # data subdirs with input for cleaning
@@ -14,7 +14,7 @@ paths_list = [ # data subdirs with input for cleaning
     data_base_dir / "processed" / "flight_xls_pointback" # accepable trials for DVs related to DISPLACEMENT and MIDLINE
 ]
 
-data_out_dir = data_base_dir / "for_analysis" # output directory for cleaned data
+data_out_dir = data_base_dir / "testing" / "for_analysis" # output directory for cleaned data
 data_out_dir.mkdir(parents=True, exist_ok=True)  # creates directory if missing
 
 
@@ -31,10 +31,10 @@ for paths in paths_list:
     else:
         trial_group = "v_r_trials" # renames file correctly for DVs related to SUBJECTIVE VERTICAL (v)/REAR (r)
 
-    print(f"Processing directory: {paths}")
+    print(f"\nCleaning data from directory: {paths}")
 
     if not paths.exists():
-        print(f"Warning: Path {paths} does not exist. Skipping...")
+        print(f"\n***WARNING*** Path {paths} does not exist. Skipping...")
         continue # skip if folder doesn't exist
 
     for flight_path in paths.iterdir():
@@ -64,19 +64,20 @@ for paths in paths_list:
 # Create new variables to use in analyses
 
 for name, df in combined_data.items():
-    print(f"\nProcessing dataset: {name}")
+    print(f"\nCleaning dataset: {name}\nAdding new variables...")
 
     # if statements make sure the required columns exist before creating new variables
-    if "csv_file" in df.columns:
+    if "csvfile" in df.columns:
         df['subj_idx'] = df['csvfile'].str.rsplit('/').str[-1].str.split('_').str[0] # subject ID
         df['bed_chair'] = df['csvfile'].str.rsplit('_').str[-2].str.split('-').str[-1] # posture condition: v=bed, r=chair
-    
+        print(f"\n✅ Added subj_idx and bed_chair to dataset: {name}")
+
+
     if "turn_displacement" in df.columns:
         df['abs_turn_displacement'] = abs(df['turn_displacement']) # absolute value of intended turn amplitude
     
     if "intended_abs_peak_velocity" in df.columns:
         df['intended_abs_peak_velocity_cat'] = round(df['intended_abs_peak_velocity'].astype('int64')) # categorical version of variable
-    
     
 
 # %%
@@ -84,15 +85,15 @@ for name, df in combined_data.items():
 try:
     vars_to_keep_path = project_dir / "vars_to_keep.csv"
     vars_to_keep = pd.read_csv(vars_to_keep_path, header=None).squeeze("columns").dropna().tolist()
-    print(f"Successfully loaded {len(vars_to_keep)} variables from vars_to_keep.csv")
+    print(f"\nSuccessfully loaded {len(vars_to_keep)} variables from vars_to_keep.csv")
 except FileNotFoundError:
-    print(f"Error: File not found - {vars_to_keep_path}")
+    print(f"\n***ERROR*** File not found - {vars_to_keep_path}")
     vars_to_keep = []
 except pd.errors.EmptyDataError:
-    print("Error: vars_to_keep.csv is empty.")
+    print("\n***ERROR*** vars_to_keep.csv is empty.")
     vars_to_keep = []
 except Exception as e:
-    print(f"Error loading vars_to_keep.csv: {e}")
+    print(f"\n***ERROR*** Error loading vars_to_keep.csv: {e}")
     vars_to_keep = []
 
 # %%
@@ -102,7 +103,7 @@ for key, df in combined_data.items():
     cols_to_keep = [col for col in vars_to_keep if col in df.columns]
 
     if not cols_to_keep:
-        print(f"Warning: No valid columns found for {key}. Skipping export.")
+        print(f"\n***WARNING*** No valid columns found for {key}. Skipping export.")
         continue
 
     # keep only selected columns in a temporary dataframe
@@ -112,6 +113,6 @@ for key, df in combined_data.items():
     out_file = data_out_dir / f"{key}_cleaned_allsubj.csv"
     try:
         df_reduced.to_csv(out_file, index=False)
-        print(f"Exported {key} file to:\n{data_out_dir}")
+        print(f"\nExported {key} file to:\n{data_out_dir}")
     except Exception as e:
-        print(f"Error saving output file: {e}")
+        print(f"\n***ERROR*** Error saving output file: {e}")
