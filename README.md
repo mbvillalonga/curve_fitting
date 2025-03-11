@@ -22,8 +22,8 @@ curve_fitting/
 |   |-- curve_functions.py      # Define polynomial / custom fxns for curve fitting
 |   |-- curve_fitting.py        # Fit curves to trial data, export model results
 |   |-- curve_fit_goodness.py   # Generate goodness of fit statistics for each model
-|   |-- anova_fitted_params.py # Run ANOVAs on estimated model parameters
-|   |-- visualization.py        # Visualize model fits
+|   |-- curve_fit_visualization.py  # Plot fitted curves over raw data
+|   |-- anova_fitted_params.py  # Run ANOVAs on estimated model parameters
 |
 |-- data/                   # Data files
 |   |-- processed/              # HP's processed data from 2012
@@ -70,6 +70,7 @@ analysis to evaluate model performance.
     - :white_check_mark: descriptives.py
     - :white_check_mark: curve_fitting.py
     - :white_check_mark: curve_fit_goodness.py
+    - :white_check_mark: curve_fit_visualization.py
     - :white_check_mark: anova_fitted_params.py
     - :white_check_mark: run_analysis.py
 
