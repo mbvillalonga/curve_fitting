@@ -12,6 +12,7 @@ from src.curve_functions import MODEL_FUNCTIONS
 from src.curve_fitting import fit_curve
 from src.curve_fit_goodness import compute_gof, plot_goodness_of_fit
 from src.anova_fitted_params import run_anova, plot_anova_results
+from src.curve_fit_visualization import plot_curve_fits
 
 # %%
 # Load .env 
@@ -153,6 +154,35 @@ for dep_var in dep_vars:
         # Save to CSV
         anova_df.to_csv(dep_var_res_dir / f"anova_results_{dep_var}_{model}.csv")
         plot_anova_results(all_fitted_params, model, anova_res, dep_var_res_dir)
-    # TO DO: check anova module for success message
+
+        # Run visualization only if curve fitting was performed
+        dep_var_res_dir = results_dir / dep_var
+        fitted_params_file = dep_var_res_dir / f"fitted_parameters_{dep_var}.csv"
+        curve_plot_out_dir = dep_var_res_dir / "curve_fit_plots"
+
+        # Ensure fitted parameters file exists before proceeding
+        if not fitted_params_file.exists():
+            print(f"Skipping visualization for {dep_var}: fitted parameters file not found.")
+            continue
+
+        # Load the fitted parameters
+        res_df = pd.read_csv(fitted_params_file)
+
+        # Determine which dataset to use
+        if dep_var in v_r_vars:
+            dataset_file = v_r_file
+        elif dep_var in d_ml_vars:
+            dataset_file = d_ml_file
+        else:
+            print(f"Skipping visualization: Dependent variable {dep_var} not recognized.")
+            continue
+
+        # Load raw dataset
+        df = pd.read_csv(dataset_file)
+
+        # Call the visualization function
+        plot_curve_fits(df, res_df, x_var, dep_var, dep_var_res_dir, plot_curves=True)
+
+    print("\nVisualization complete. Figures saved in: ", dep_var_res_dir)
 
 print("\nAnalysis complete. Results saved in: ", results_dir)

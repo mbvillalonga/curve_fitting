@@ -82,7 +82,9 @@ def plot_curve_fits(raw_df, res_df, x_var, dep_var, output_dir, plot_curves=Fals
             filename = f"{dep_var}_subj_{subj_idx}_{model_name}_fits.pdf"
             plt.suptitle(f"{dep_var} - Subject {subj_idx}\n{model_name.capitalize()} Fits", fontsize=16, fontweight='bold')
             plt.subplots_adjust(top=0.9)
-            plt.savefig(os.path.join(output_dir, filename))
+            plot_dir = output_dir / "curve_fit_plots"
+            plot_dir.mkdir(parents=True, exist_ok=True)
+            plt.savefig(os.path.join(plot_dir, filename))
             plt.close(fig)
 
 if __name__ == "__main__":

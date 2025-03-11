@@ -69,7 +69,7 @@ def plot_goodness_of_fit(df, dep_var, output_dir):
     plt.suptitle("Comparison of R^2 Across Models, Grouped by Condition")
     plt.xticks(rotation=45)
     plt.tight_layout()
-    plt.savefig(output_dir / "r_squared_comparison_by_condition.png")
+    plt.savefig(output_dir / f"r_squared_comparison_by_condition_{dep_var}.png")
     plt.close()
 
     # Boxplot for RMSE across models, grouped by gravity level and posture
