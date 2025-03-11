@@ -34,7 +34,6 @@ curve_fitting/
 |-- run_analysis.py         # Main script that runs everything
 |-- requirements.txt        # Dependencies for the project
 
-
 ```
 
 ## Features
