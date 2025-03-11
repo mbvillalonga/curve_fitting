@@ -2,9 +2,6 @@ import pandas as pd
 from statsmodels.stats.anova import AnovaRM
 from pathlib import Path
 
-# Define valid subjects (manually confirmed to have all conditions)
-VALID_SUBJECTS = {"PD", "JRL", "AW", "BY", "IS"}
-
 def run_anova(df, model_name):
     """
     Performed a repeated measures ANOVA (g_level_corrected x bed_chair)
@@ -158,6 +155,9 @@ if __name__ == "__main__":
     params_path = Path(__file__).resolve().parent.parent / "data" / "curve_fitting_output" / "fitted_parameters_all_models.csv"
     output_dir = Path(__file__).resolve().parent.parent / "data" / "curve_fitting_output" / "anova_plots"
     output_dir.mkdir(exist_ok=True)
+
+    # Define valid subjects (manually confirmed to have all conditions)
+    VALID_SUBJECTS = {"PD", "JRL", "AW", "BY", "IS"}
 
     # Load fitted parameters
     df = pd.read_csv(params_path)
